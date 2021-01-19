@@ -38,15 +38,18 @@ public class Main {
 //            }
 //        } else {
 
-            ImageLsbTool imageLsbTool = new ImageLsbTool();
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("Přejete si:\n1 - Ukrýt text v obrázku\n2 - Získat text ukrytý v obrázku\n(zadejte číslo volby)");
-            int option = scanner.nextInt();
-            LOGGER.info("Entered: " + option);
-            imageLsbTool.imageLsbProcessManager(option);
+        TranspositionCipher transpositionCipher = new TranspositionCipher();
+        transpositionCipher.encodeText("abcdefghijklmnopqrstuvwxyz");
 
-            System.out.println("Stiskněte klávesu Enter pro ukončení aplikace...");
-            new Scanner(System.in).nextLine();
+//            ImageLsbTool imageLsbTool = new ImageLsbTool();
+//            Scanner scanner = new Scanner(System.in);
+//            System.out.println("Přejete si:\n1 - Ukrýt text v obrázku\n2 - Získat text ukrytý v obrázku\n(zadejte číslo volby)");
+//            int option = scanner.nextInt();
+//            LOGGER.info("Entered: " + option);
+//            imageLsbTool.imageLsbProcessManager(option);
+//
+//            System.out.println("Stiskněte klávesu Enter pro ukončení aplikace...");
+//            new Scanner(System.in).nextLine();
 
 //        }
 

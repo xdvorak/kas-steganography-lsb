@@ -27,25 +27,11 @@ public class ImageLsbTool {
         }
     }
 
-    // normalizace ceskych stringu (odstraneni diakritiky)
-    public String normalizeString(final String string) {
-        if (string == null) {
-            return null;
-        }
-        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-        String temp = string.trim();
-        temp = Normalizer.normalize(temp, Normalizer.Form.NFD);
-        temp = pattern.matcher(temp).replaceAll("");
-        temp = temp.replaceAll("[\uFEFF-\uFFFF]", "");
-
-        return temp.toLowerCase();
-    }
-
     // precteni vstupniho textu (tzv "plaintext")
     private String loadText() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Zapište text vkládaný do obrázku:");
-        String text = normalizeString(scanner.nextLine());
+        String text = Utils.normalizeString(scanner.nextLine());
         LOGGER.info("Entered: " + text);
         return text;
     }
