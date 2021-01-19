@@ -4,73 +4,137 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Scanner;
 
 public class ImageLsbTool {
 
-    // precteni vstupniho obrazku
-    public BufferedImage loadImage(){
+    // precteni vstupniho textu (tzv "plaintext")
+    private String loadText(){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Zapište text vkládaný do obrázku:");
+        String text = scanner.nextLine();
+        System.out.println("Zadáno: " + text);
+        return text;
+    }
+
+    // precteni vstupniho obrazku (tzv "covertext")
+    private BufferedImage loadImage(){
         Scanner scanner = new Scanner(System.in);
         System.out.println("Zadejte cestu k obrázku.");
         String path = scanner.nextLine();
         System.out.println("Zadáno: " + path);
         try {
             return ImageIO.read(new File(path));
-        } catch (IOException e){
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
         return null;
     }
 
-    public void alterImage(BufferedImage bufferedImage){
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Zapište text vkládaný do obrázku:");
-        String text = scanner.nextLine();
-        System.out.println("Zadáno: " + text);
+    public void alterImage(){
 
-        //Ověř velikost obrázku, text musí být menší než počet pixelů
-        if (text.length() > (bufferedImage.getWidth() * bufferedImage.getHeight()))
-        {
-            System.out.println("A bigger image is required to store this data!");
-        } else
-        {
+        String plainText = loadText();
+        BufferedImage inputBufferedImage = loadImage();
+
+        // Ověř velikost obrázku, obrázek musí mít dostatečný počet pixelů odpovídající počtu bitů v textu.
+        // Dodatečně je potřeba 1 byte na uložení koncového znaku 00000000;
+        if ((plainText.length() * 8) >= (inputBufferedImage.getWidth() * inputBufferedImage.getHeight() - 8)) {
+            System.out.println("Pro uložení tohoto textu je potřeba větší obrázek! Změnit text nebo obrázek?");
+        } else {
             System.out.println("Probíhá vkládání...");
-            BufferedImage alteredBufferedImage = embedTextIntoImage(bufferedImage, text);
-            //save
+            BufferedImage alteredBufferedImage = embedTextIntoImage(inputBufferedImage, plainText);
+            System.out.println("Text vložen do obrázku.");
+            saveOutputImage(alteredBufferedImage);
+            System.out.println("Výstupní obrázek uložen.");
+        }
+    }
+
+    public void encryptImage(){
+
+        BufferedImage inputBufferedImage = loadImage();
+
+        System.out.println("Probíhá získávání textu z obrázku...");
+        String extractedText = extractTextFromImage(inputBufferedImage);
+        System.out.println("Text z obrázku získán.");
+    }
+
+    private void saveOutputImage(BufferedImage outputImage){
+        try {
+            File outputfile = new File("output" + new Date().getTime() + ".png");
+            ImageIO.write(outputImage, "png", outputfile);
+        } catch (IOException e) {
+
         }
     }
 
     private BufferedImage embedTextIntoImage(BufferedImage inputImage, String text){
 
-        int x = 0;
-        int y = 0;
-        int asciiValue;//x= x coordinate, y=y coordinate of image starting from top left .
-        final int EXTRACTOR = 0x00000001;//BitMask to extract last bit of character.
+        int x = 0, y = 0;
+        int charAsciiValue;
+        final int EXTRACTOR = 0x00000001;
         final int ZEROATLAST = 0xfffffffe;
 
         for (int i = 0; i <= text.length(); i++){
             if (i < text.length()){
-                asciiValue = text.charAt(i);
+                charAsciiValue = text.charAt(i);
             } else {
-                asciiValue = 0;// Will be used at the end to mark the end of text.
+                charAsciiValue = 0;
             }
-            for (int j = 0; j < 8; j++){//8 bits forms a character.
-                int bitValue = asciiValue & EXTRACTOR;//extracts single bit from the character
+            for (int j = 0; j < 8; j++){
+                int bitValue = charAsciiValue & EXTRACTOR;
+                System.out.println("Old:" + Integer.toBinaryString(inputImage.getRGB(x, y)));
                 if (bitValue == 1) {
-                    inputImage.setRGB(x, y, inputImage.getRGB(x, y) | EXTRACTOR);//Replaces least significant value of the blue color of the pixel with 1.
+                    inputImage.setRGB(x, y, inputImage.getRGB(x, y) | EXTRACTOR);
                 } else {
-                    inputImage.setRGB(x, y, inputImage.getRGB(x, y) & ZEROATLAST);//Replaces least significant value of the blue color of the pixel with 0.
+                    inputImage.setRGB(x, y, inputImage.getRGB(x, y) & ZEROATLAST);
                 }
+                System.out.println("New:" + Integer.toBinaryString(inputImage.getRGB(x, y)));
+                System.out.println("-----------------------");
                 x++;
 
                 if (x >= inputImage.getWidth()) {
                     x = 0;
                     y++;
                 }
-                asciiValue = asciiValue >> 1;
+                charAsciiValue = charAsciiValue >> 1;
             }
         }
         return inputImage;
+    }
+
+    private String extractTextFromImage(BufferedImage image) {
+        int x = 0, y = 0, bitValue;
+        final int EXTRACTOR = 0x00000001;
+        final int ONEATSTART=0x80;
+        char chars;
+        int asciiCode = 0;
+        String output = "";
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; ; i++) {
+            for (int j = 0; j < 8; j++) {
+                bitValue = image.getRGB(x, y) & EXTRACTOR;//Extracts last bit from blue color.
+                x++;
+
+                if (x >= image.getWidth()) {
+                    x = 0;
+                    y++;
+                }
+                asciiCode = asciiCode >> 1;//Left shift to form the character moving the bits by one place and store a new bit.
+                if (bitValue == 1) {
+                    asciiCode = asciiCode | ONEATSTART;//Replaces bit value with 1
+                }
+            }
+            if (asciiCode == 0) {
+                break;
+            }
+            chars = (char) asciiCode;
+
+            output = output + chars;
+            stringBuilder.append(chars);
+        }
+        System.out.println(output);
+        return stringBuilder.toString();
     }
 
 }
