@@ -18,13 +18,13 @@ public class ImageLsbTool {
     // organizace procesu
     public void imageLsbProcessManager(int option){
 
-        LOGGER.setLevel(Level.INFO);
-
         if (option == 1) {
             alterImage();
         } else if (option == 2) {
             extractFromImage();
         }
+
+        System.out.println("Vše hotovo.");
     }
 
     // precteni vstupniho textu (tzv "plaintext")
@@ -53,16 +53,29 @@ public class ImageLsbTool {
     // metoda starajici se o vkladani textu do obrazku a kontrolu vstupu
     private void alterImage() {
 
-        String plainText = loadText();
+        // priprava vstupniho textu
+        String inputText = loadText();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Přejete si text nejprve zašifrovat pomoci transpozicni sifry?" +
+                "\n1 - Ano\n2 - Ne\n(zadejte číslo volby)");
+        int encrypt = scanner.nextInt();
+        LOGGER.info("Entered: " + encrypt);
+        if (encrypt == 1) {
+            TranspositionCipher transpositionCipher = new TranspositionCipher();
+            inputText = transpositionCipher.encodeText(inputText);
+        }
+
+
+        //vstupni obrazek
         BufferedImage inputBufferedImage = loadImage();
 
         // Over velikost obrazku, obrazek musi mit dostatecny pocet pixelu odpovidajici poctu bitu v textu.
         // Dodatecne je potreba 1 byte na ulozeni koncoveho znaku 00000000.
-        if ((plainText.length() * 8) >= (inputBufferedImage.getWidth() * inputBufferedImage.getHeight() - 8)) {
+        if ((inputText.length() * 8) >= (inputBufferedImage.getWidth() * inputBufferedImage.getHeight() - 8)) {
             System.out.println("Pro uložení tohoto textu je potřeba větší obrázek!");
         } else {
             System.out.println("Probíhá vkládání...");
-            BufferedImage alteredBufferedImage = insertTextIntoImage(inputBufferedImage, plainText);
+            BufferedImage alteredBufferedImage = insertTextIntoImage(inputBufferedImage, inputText);
             saveOutputImage(alteredBufferedImage);
         }
     }
@@ -74,6 +87,16 @@ public class ImageLsbTool {
         System.out.println("Probíhá získávání textu z obrázku...");
         String extractedText = extractTextFromImage(inputBufferedImage);
         System.out.println("Text získaný z obrázku:\n" + extractedText);
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Text nedává smysl? Pokud máte k dispozici klíč, můžete jej zkusit rozšifrovat." +
+                "\n1 - Ano, mám klíč\n2 - Ne, text je v pořádku\n(zadejte číslo volby)");
+        int decrypt = scanner.nextInt();
+        LOGGER.info("Entered: " + decrypt);
+        if (decrypt == 1) {
+            TranspositionCipher transpositionCipher = new TranspositionCipher();
+            transpositionCipher.decodeText(extractedText);
+        }
     }
 
     // Ulozeni vystupniho obrazku
