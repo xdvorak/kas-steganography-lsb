@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+// trida starajici se o vkladani a ziskavani textu do a z obrazku pomoci metody lsb
 public class ImageLsbTool {
 
     private final static Logger LOGGER = Logger.getLogger(ImageLsbTool.class.getName());

@@ -5,6 +5,7 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+// trida starajici se o kodovani a dekodovani textovych zprav pomoci jednoduche transpozicni sifry
 public class TranspositionCipher {
 
     private final static Logger LOGGER = Logger.getLogger(TranspositionCipher.class.getName());
@@ -42,6 +43,7 @@ public class TranspositionCipher {
         return output.toString();
     }
 
+    // desifrovani transpozicni sifry s klicem
     public String decodeText(String encryptedText){
 
         String key = keyInput(encryptedText.length());
@@ -53,6 +55,7 @@ public class TranspositionCipher {
         ArrayList<Integer> keyIndexArray = getIndexSequence(key);
         int numberOfLines = encryptedText.length() / key.length();
 
+        // cteni po "sloupcich"
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < key.length(); i++) {
             for (int j = 0; j < encryptedText.length(); j = j + numberOfLines) {

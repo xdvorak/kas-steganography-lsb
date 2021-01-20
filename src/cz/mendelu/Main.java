@@ -19,31 +19,31 @@ public class Main {
 
         // globalni nastaveni logovani
         Logger rootLogger = LogManager.getLogManager().getLogger("");
-        rootLogger.setLevel(Level.INFO);
+        rootLogger.setLevel(Level.OFF);
         for (Handler h : rootLogger.getHandlers()) {
-            h.setLevel(Level.INFO);
+            h.setLevel(Level.OFF);
         }
 
-        // zakomentovaná část slouží pro vyvolání příkazové řádky v případě spustitelného jar souboru
+        // zakomentovana cast slouzi pro vyvolani prikazove radky v pripade spustitelneho jar souboru
 
-        Console console = System.console();
-        if(console == null && !GraphicsEnvironment.isHeadless()) {
-            String filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
-            try {
-                File batch = new File("Launcher.bat");
-                if(!batch.exists()){
-                    batch.createNewFile();
-                    PrintWriter writer = new PrintWriter(batch);
-                    writer.println("@echo off");
-                    writer.println("java -jar "+filename);
-                    writer.println("exit");
-                    writer.flush();
-                }
-                Runtime.getRuntime().exec("cmd /c start \"\" "+batch.getPath());
-            } catch(IOException e) {
-                e.printStackTrace();
-            }
-        } else {
+//        Console console = System.console();
+//        if(console == null && !GraphicsEnvironment.isHeadless()) {
+//            String filename = Main.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
+//            try {
+//                File batch = new File("Launcher.bat");
+//                if(!batch.exists()){
+//                    batch.createNewFile();
+//                    PrintWriter writer = new PrintWriter(batch);
+//                    writer.println("@echo off");
+//                    writer.println("java -jar "+filename);
+//                    writer.println("exit");
+//                    writer.flush();
+//                }
+//                Runtime.getRuntime().exec("cmd /c start \"\" "+batch.getPath());
+//            } catch(IOException e) {
+//                e.printStackTrace();
+//            }
+//        } else {
 
             ImageLsbTool imageLsbTool = new ImageLsbTool();
             Scanner scanner = new Scanner(System.in);
@@ -55,7 +55,7 @@ public class Main {
             System.out.println("Stiskněte klávesu Enter pro ukončení aplikace...");
             new Scanner(System.in).nextLine();
 
-        }
+//        }
     }
 
 }
