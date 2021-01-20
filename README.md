@@ -14,5 +14,6 @@ Ke spuštění stačí otevřít spustitelný soubor "kas-steganography-lsb.jar"
 - Pro testovací účely je v hlavním adresáři také obrázek test.png, který je možné využít pro otevstování funkčnosti.
 - Vygenerovaný obrázek ve formátu png je umístěn do hlavní složky s názvem ve tvaru "output" + timestamp v době generování souboru.
 - Veškerý kód je vhodně okomentovaný
+- Otestováno na Windows 10
 
 Odkaz na repozitář: https://github.com/xdvorak/kas-steganography-lsb
